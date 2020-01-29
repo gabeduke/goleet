@@ -7,13 +7,13 @@ BINFMT_MISC_GO := $(BINFMT_MISC)/golang
 GORUN := /usr/local/bin/gorun
 
 BIN := $(abspath bin)
-SCRIPTS := $(shell basename $(dir $(wildcard ./scripts/*/)))
-SCRIPTS_ABS := $(foreach script,$(SCRIPTS),$(BIN)/$(script))
+APPS := $(shell basename $(dir $(wildcard ./app/*/)))
+APPS_ABS := $(foreach app,$(APPS),$(BIN)/$(app))
 
 .DEFAULT_GOAL = help
 
 asdf:
-	@echo $(shell basename $(SCRIPTS_ABS))
+	@echo $(shell basename $(APPS_ABS))
 
 ##########################################################
 ##@ INIT
@@ -36,7 +36,7 @@ $(BINFMT_MISC_GO):
 ##########################################################
 .PHONY: build clean
 
-build: $(BIN) $(SCRIPTS_ABS)							## Build all of the scripts in `scripts/`
+build: $(BIN) $(APPS_ABS)							## Build all of the apps in `apps/`
 	$(info Build directory is $(BIN))
 
 
@@ -52,9 +52,9 @@ check:
 $(BIN):
 	@mkdir -p $(BIN)
 
-$(SCRIPTS_ABS):
+$(APPS_ABS):
 	$(info building $(shell basename $@)..)
-	@go build -o $(BIN) ./scripts/$(shell basename $@)
+	@go build -o $(BIN) ./apps/$(shell basename $@)
 	$(info build $(shell basename $@) success!)
 
 ##########################################################

@@ -1,12 +1,12 @@
 # GoLeet
 
-Collection of scripts and packages to ease scripting in Go.
+Collection of apps and packages to ease scripting in Go.
 
 ## Usage
 
 _Repository format_:
  
-* folders in the scripts directory is a self documenting executable program that should handle it's own dependencies
+* folders in the apps directory is a self documenting executable program that should handle it's own dependencies
 * packages can be imported and shared across libraries. They should be testable and expose an interface where possible
 
 ```sh
@@ -16,7 +16,7 @@ _Repository format_:
 │   ├── codes
 │   └── ...
 ├── README.md
-└── scripts
+└── apps
     └── hello
         ├── README.md
         └── hello.go
@@ -26,7 +26,7 @@ _Repository format_:
 
 **Simple**:
 
-To run programs in the `scripts/` folder simply use `go run scripts/[pkg]/[script].go`
+To run programs in the `apps/` folder simply use `go run apps/[pkg]/[app].go`
 
 **Advanced**:
 
