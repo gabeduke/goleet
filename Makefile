@@ -7,36 +7,17 @@ BINFMT_MISC_GO := $(BINFMT_MISC)/golang
 GORUN := /usr/local/bin/gorun
 
 BIN := $(abspath bin)
-APPS := $(shell basename $(dir $(wildcard ./app/*/)))
-APPS_ABS := $(foreach app,$(APPS),$(BIN)/$(app))
+APPS = hello state
+APPS_BUILD = $(addprefix bin/, $(APPS))
 
 .DEFAULT_GOAL = help
-
-asdf:
-	@echo $(shell basename $(APPS_ABS))
-
-##########################################################
-##@ INIT
-##########################################################
-.PHONY: init
-
-init: $(GORUN) $(BINFMT_MISC_GO)						## Download golang tool 'gorun' and register the extension in /proc
-
-$(GORUN):
-	$(info installing gorun..)
-	@$(shell go get -u github.com/erning/gorun)
-	@$(shell sudo mv ~/go/bin/gorun /usr/local/bin/)
-
-$(BINFMT_MISC_GO):
-	$(info installing binary proc extension..)
-	@echo '$(PROC_CMD)' | sudo tee /proc/sys/fs/binfmt_misc/register
 
 ##########################################################
 ##@ GO
 ##########################################################
 .PHONY: build clean
 
-build: $(BIN) $(APPS_ABS)							## Build all of the apps in `apps/`
+build: $(BIN) $(APPS_BUILD)							## Build all of the apps in `app/`
 	$(info Build directory is $(BIN))
 
 
@@ -52,10 +33,10 @@ check:
 $(BIN):
 	@mkdir -p $(BIN)
 
-$(APPS_ABS):
-	$(info building $(shell basename $@)..)
-	@go build -o $(BIN) ./apps/$(shell basename $@)
-	$(info build $(shell basename $@) success!)
+bin/%: app/*/%.go
+	$(info building $<)
+	@go build -o $@ $<
+	$(info $@ success!)
 
 ##########################################################
 ##@ TEST
@@ -83,7 +64,18 @@ docs:													## Serve package godocs
 ##########################################################
 ##@ UTIL
 ##########################################################
-.PHONY: help
+.PHONY: help init
+
+init: $(GORUN) $(BINFMT_MISC_GO)						## Download golang tool 'gorun' and register the extension in /proc
+
+$(GORUN):
+	$(info installing gorun..)
+	@$(shell go get -u github.com/erning/gorun)
+	@$(shell sudo mv ~/go/bin/gorun /usr/local/bin/)
+
+$(BINFMT_MISC_GO):
+	$(info installing binary proc extension..)
+	@echo '$(PROC_CMD)' | sudo tee /proc/sys/fs/binfmt_misc/register
 
 help:													## show help
 		@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m 	%s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
